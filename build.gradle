@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id "io.qameta.allure" version "2.8.1"
+    id 'groovy'
+}
+defaultTasks 'clean', 'test'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+allure {
+    autoconfigure = true
+    aspectjweaver = true
+    aspectjVersion = '1.9.4'
+    version = '2.10.0'
+}
+
+configurations {
+    agent
+}
+
+dependencies {
+    agent 'org.aspectj:aspectjweaver:1.9.4'
+    testCompile 'io.qameta.allure:allure-junit5:2.13.2'
+    testCompile 'org.aspectj:aspectjtools:1.9.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+    testCompile 'org.hamcrest:hamcrest:2.1'
+    testImplementation 'io.rest-assured:rest-assured:4.2.0'
+    testImplementation 'io.rest-assured:json-path:4.2.0'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.3'
+    testCompileOnly 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test.doFirst {
+    jvmArgs "-javaagent:${configurations.agent.singleFile}"
+}
+
+test {
+    systemProperty "file.encoding", "UTF-8"
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    if (project.hasProperty("baseUrl")) {
+        systemProperties['baseUrl'] = baseUrl
+    }
+
+    if (project.hasProperty("token")) {
+        systemProperties['token'] = token
+    }
+}

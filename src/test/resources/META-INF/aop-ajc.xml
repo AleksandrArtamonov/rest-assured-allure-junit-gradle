@@ -1,0 +1,5 @@
+<aspectj>
+    <aspects>
+        <aspect name="listeners.CustomAspect"/>
+    </aspects>
+</aspectj>
